@@ -1,0 +1,18 @@
+package solver;
+
+import java.util.*;
+
+public class GeneticSolver extends SudokuSolverBase {
+
+    public GeneticSolver(int[][] board) {
+        super(board);
+    }
+
+    public boolean isSolvable() {
+        return solve() != null;
+    }
+
+    @Override
+    public int[][] solve() {
+        return new int[0][];
+    }}

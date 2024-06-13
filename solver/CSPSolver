@@ -1,0 +1,12 @@
+package solver;
+
+public class CSPSolver extends SudokuSolverBase {
+
+    public CSPSolver(int[][] board) {
+        super(board);
+    }
+
+    @Override
+    public int[][] solve() {
+        return new int[0][];
+    }}

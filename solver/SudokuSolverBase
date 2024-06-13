@@ -1,0 +1,106 @@
+package solver;
+
+import java.util.*;
+
+public abstract class SudokuSolverBase {
+    protected final int[][] board;
+    protected final int size;
+    protected final int sqrtSize;
+    protected final Random random = new Random();
+
+    public SudokuSolverBase(int[][] board) {
+        this.board = board;
+        this.size = board.length;
+        this.sqrtSize = (int) Math.sqrt(size);
+    }
+
+    protected boolean isValid(int row, int col, int num) {
+        return !usedInRow(row, num) && !usedInCol(col, num) && !usedInBox(row - row % sqrtSize, col - col % sqrtSize, num);
+    }
+
+    private boolean usedInRow(int row, int num) {
+        for (int col = 0; col < size; col++) {
+            if (board[row][col] == num) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean usedInCol(int col, int num) {
+        for (int row = 0; row < size; row++) {
+            if (board[row][col] == num) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean usedInBox(int boxStartRow, int boxStartCol, int num) {
+        for (int row = 0; row < sqrtSize; row++) {
+            for (int col = 0; col < sqrtSize; col++) {
+                if (board[row + boxStartRow][col + boxStartCol] == num) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected int[] getColumn(int[][] board, int col) {
+        int[] column = new int[size];
+        for (int i = 0; i < size; i++) {
+            column[i] = board[i][col];
+        }
+        return column;
+    }
+
+    protected int[] getBox(int[][] board, int row, int col) {
+        int[] box = new int[size];
+        int index = 0;
+        for (int i = 0; i < sqrtSize; i++) {
+            for (int j = 0; j < sqrtSize; j++) {
+                box[index++] = board[row + i][col + j];
+            }
+        }
+        return box;
+    }
+
+    protected List<Integer> getPossibleNumbers(int row, int col, int[][] candidate) {
+        boolean[] used = new boolean[size + 1];
+        for (int i = 0; i < size; i++) {
+            used[candidate[row][i]] = true;
+            used[candidate[i][col]] = true;
+        }
+
+        int boxRowStart = row - row % sqrtSize;
+        int boxColStart = col - col % sqrtSize;
+
+        for (int i = 0; i < sqrtSize; i++) {
+            for (int j = 0; j < sqrtSize; j++) {
+                used[candidate[boxRowStart + i][boxColStart + j]] = true;
+            }
+        }
+
+        List<Integer> possibleNumbers = new ArrayList<>();
+        for (int num = 1; num <= size; num++) {
+            if (!used[num]) {
+                possibleNumbers.add(num);
+            }
+        }
+
+        return possibleNumbers;
+    }
+
+    public static void printBoard(int[][] board) {
+        int size = board.length;
+        for (int[] ints : board) {
+            for (int j = 0; j < size; j++) {
+                System.out.print(ints[j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public abstract int[][] solve();
+}
