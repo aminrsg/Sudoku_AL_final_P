@@ -3,16 +3,73 @@ package solver;
 import java.util.*;
 
 public class GeneticSolver extends SudokuSolverBase {
+    private static final int POPULATION_SIZE = 1000;
+    private static final int TOURNAMENT_SIZE = 5;
+    private static final double CROSSOVER_RATE = 0.8;
+    private static final double MUTATION_RATE = 0.1;
+    private static final int MAX_GENERATIONS = 1000;
 
     public GeneticSolver(int[][] board) {
         super(board);
     }
 
-    public boolean isSolvable() {
-        return solve() != null;
+        @Override
+    public int[][] solve() {
+        List<int[][]> population = initializePopulation();
+        int generation = 0;
+
+        while (generation < MAX_GENERATIONS) {
+            population = evolvePopulation(population);
+            int[][] bestCandidate = getBestCandidate(population);
+
+            if (fitness(bestCandidate) == 0) {
+                return bestCandidate;
+            }
+
+            generation++;
+        }
+
+        return null;
     }
 
-    @Override
-    public int[][] solve() {
-        return new int[0][];
-    }}
+        private List<int[][]> initializePopulation() {
+        List<int[][]> population = new ArrayList<>();
+
+        for (int i = 0; i < POPULATION_SIZE; i++) {
+            int[][] candidate = createCandidate();
+            population.add(candidate);
+        }
+
+        return population;
+    }
+        private int[][] createCandidate() {
+        int[][] candidate = new int[size][size];
+
+        for (int i = 0; i < size; i++) {
+            System.arraycopy(board[i], 0, candidate[i], 0, size);
+        }
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (candidate[i][j] == 0) {
+                    List<Integer> possibleNumbers = getPossibleNumbers(i, j, candidate);
+                    if (!possibleNumbers.isEmpty()) {
+                        candidate[i][j] = possibleNumbers.get(random.nextInt(possibleNumbers.size()));
+                    } else {
+                        candidate[i][j] = 0;
+                    }
+                }
+            }
+        }
+
+        return candidate;
+    }
+
+    private List<int[][]> evolvePopulation(List<int[][]> population) {
+        List<int[][]> newPopulation = new ArrayList<>();
+
+        return newPopulation;
+    }
+
+    
+    }
