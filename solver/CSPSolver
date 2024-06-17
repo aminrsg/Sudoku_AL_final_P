@@ -8,5 +8,9 @@ public class CSPSolver extends SudokuSolverBase {
 
     @Override
     public int[][] solve() {
-        return new int[0][];
-    }}
+        if (solveSudoku()) {
+            return board;
+        }
+        return null;
+    }
+}

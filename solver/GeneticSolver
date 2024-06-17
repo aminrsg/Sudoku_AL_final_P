@@ -13,13 +13,15 @@ public class GeneticSolver extends SudokuSolverBase {
         super(board);
     }
 
-        @Override
+
+
+    @Override
     public int[][] solve() {
         List<int[][]> population = initializePopulation();
         int generation = 0;
 
         while (generation < MAX_GENERATIONS) {
-            population = evolvePopulation(population);
+            population = evolvePopulation(population); 
             int[][] bestCandidate = getBestCandidate(population);
 
             if (fitness(bestCandidate) == 0) {
@@ -29,10 +31,10 @@ public class GeneticSolver extends SudokuSolverBase {
             generation++;
         }
 
-        return null;
+        return null; 
     }
 
-        private List<int[][]> initializePopulation() {
+    private List<int[][]> initializePopulation() {
         List<int[][]> population = new ArrayList<>();
 
         for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -42,7 +44,8 @@ public class GeneticSolver extends SudokuSolverBase {
 
         return population;
     }
-        private int[][] createCandidate() {
+
+    private int[][] createCandidate() {
         int[][] candidate = new int[size][size];
 
         for (int i = 0; i < size; i++) {
@@ -68,8 +71,94 @@ public class GeneticSolver extends SudokuSolverBase {
     private List<int[][]> evolvePopulation(List<int[][]> population) {
         List<int[][]> newPopulation = new ArrayList<>();
 
+        for (int i = 0; i < POPULATION_SIZE; i++) {
+            int[][] parent1 = tournamentSelection(population);
+            int[][] parent2 = tournamentSelection(population);
+            int[][] child = crossover(parent1, parent2);
+            mutate(child);
+            newPopulation.add(child);
+        }
+
         return newPopulation;
     }
 
-    
+    private int[][] crossover(int[][] parent1, int[][] parent2) {
+        int[][] child = new int[size][size];
+
+        for (int i = 0; i < size; i++) {
+            if (random.nextDouble() < CROSSOVER_RATE) {
+                System.arraycopy(parent1[i], 0, child[i], 0, size);
+            } else {
+                System.arraycopy(parent2[i], 0, child[i], 0, size);
+            }
+        }
+
+        return child;
     }
+
+    private void mutate(int[][] candidate) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (board[i][j] == 0 && random.nextDouble() < MUTATION_RATE) {
+                    List<Integer> possibleNumbers = getPossibleNumbers(i, j, candidate);
+                    if (!possibleNumbers.isEmpty()) {
+                        candidate[i][j] = possibleNumbers.get(random.nextInt(possibleNumbers.size()));
+                    }
+                }
+            }
+        }
+    }
+
+    private int[][] tournamentSelection(List<int[][]> population) {
+        List<int[][]> tournament = new ArrayList<>();
+
+        for (int i = 0; i < TOURNAMENT_SIZE; i++) {
+            tournament.add(population.get(random.nextInt(POPULATION_SIZE)));
+        }
+
+        return getBestCandidate(tournament);
+    }
+
+    private int[][] getBestCandidate(List<int[][]> population) {
+        return population.stream()
+                .min(Comparator.comparingInt(this::fitness))
+                .orElseThrow(() -> new IllegalStateException("Population is empty"));
+    }
+
+    private int fitness(int[][] candidate) {
+        int fitness = 0;
+
+        for (int i = 0; i < size; i++) {
+            fitness += countDuplicates(candidate[i]);
+            fitness += countDuplicates(getColumn(candidate, i));
+        }
+
+        for (int row = 0; row < size; row += sqrtSize) {
+            for (int col = 0; col < size; col += sqrtSize) {
+                fitness += countDuplicates(getBox(candidate, row, col));
+            }
+        }
+
+        return fitness;
+    }
+
+    private int countDuplicates(int[] array) {
+        boolean[] seen = new boolean[size + 1];
+        int duplicates = 0;
+
+        for (int num : array) {
+            if (num != 0) {
+                if (seen[num]) {
+                    duplicates++;
+                } else {
+                    seen[num] = true;
+                }
+            }
+        }
+
+        return duplicates;
+    }
+    public boolean isSolvable() {
+        return solve() != null;
+    }
+}
