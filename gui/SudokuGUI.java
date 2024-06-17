@@ -74,7 +74,25 @@ public class SudokuGUI extends JFrame {
         sudokuPanel.repaint();
     }
 
+    private void solveWithCSP() {
+        if (isSolved) {
+            JOptionPane.showMessageDialog(this, "Sudoku is already solved!");
+        } else {
+            CSPSolver cspSolver = new CSPSolver(board);
+            int[][] cspSolvedBoard = cspSolver.solve();
+            handleSolution(cspSolvedBoard);
+        }
+    }
 
+    private void solveWithGenetic() {
+        if (isSolved) {
+            JOptionPane.showMessageDialog(this, "Sudoku is already solved!");
+        } else {
+            GeneticSolver solver = new GeneticSolver(board);
+            int[][] solvedBoard = solver.solve();
+            handleSolution(solvedBoard);
+        }
+    }
 
     private void handleSolution(int[][] solvedBoard) {
         if (solvedBoard != null) {

@@ -1,13 +1,12 @@
-import javax.swing.*;
-import gui.SudokuGUI;
 import builder.Sudoku;
-import enums.level;
+import enums.Level;
+import gui.SudokuGUI;
+import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        
         Sudoku sudoku = new Sudoku.Builder()
-                .size(4)
+                .size(9)
                 .build();
         sudoku.generate();
         sudoku.printBoard();
